@@ -6,13 +6,15 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class NewBingGoGoClientWebSocket extends WebSocketClient {
     NewBingGoGoServerWebSocket newBingGoGoServerWebSocket;
     LinkedList<String> messList;
-    public NewBingGoGoClientWebSocket(URI serverUri,NewBingGoGoServerWebSocket newBingGoGoServerWebSocket,LinkedList<String> messList) {
-        super(serverUri);
+    public NewBingGoGoClientWebSocket(URI serverUri,NewBingGoGoServerWebSocket newBingGoGoServerWebSocket,LinkedList<String> messList, Map<String,String> headers) {
+        super(serverUri, headers);
         this.newBingGoGoServerWebSocket = newBingGoGoServerWebSocket;
         this.messList = messList;
     }

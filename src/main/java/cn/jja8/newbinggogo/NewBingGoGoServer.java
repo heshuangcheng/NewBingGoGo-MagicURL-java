@@ -162,11 +162,12 @@ public class NewBingGoGoServer extends NanoWSD {
         }
 
         //将数据全部读取然后关闭流和链接
-        int len = urlConnection.getContentLength();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(Math.max(len, 0));
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try(InputStream inputStream = urlConnection.getInputStream()){
-            for (int i = 0; i < len; i++) {
-                byteArrayOutputStream.write(inputStream.read());
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
             }
         }catch (FileNotFoundException e){
             urlConnection.disconnect();
@@ -178,6 +179,7 @@ public class NewBingGoGoServer extends NanoWSD {
         urlConnection.disconnect();
 
         //创建用于输出的流
+        int len = byteArrayOutputStream.size();
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         return NanoHTTPD.newFixedLengthResponse(
                 Response.Status.OK,
