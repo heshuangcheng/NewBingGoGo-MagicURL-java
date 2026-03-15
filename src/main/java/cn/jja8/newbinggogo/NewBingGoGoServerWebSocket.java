@@ -6,12 +6,15 @@ import fi.iki.elonen.NanoWSD;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class NewBingGoGoServerWebSocket extends NanoWSD.WebSocket {
+    private static final String[] FORWARD_HEADER_KEYS = {"cookie", "user-agent", "accept-language"};
     NewBingGoGoClientWebSocket newBingGoGoClientWebSocket;
     LinkedList<String> messList = new LinkedList<>();
     ScheduledExecutorService scheduledExecutorService;
@@ -26,7 +29,15 @@ public class NewBingGoGoServerWebSocket extends NanoWSD.WebSocket {
             throw new RuntimeException(e);//这个异常这辈子都不会出的
         }
         this.scheduledExecutorService = scheduledExecutorService;
-        newBingGoGoClientWebSocket = new NewBingGoGoClientWebSocket(url,this,messList);
+        Map<String, String> sessionHeaders = handshakeRequest.getHeaders();
+        Map<String, String> forwardHeaders = new HashMap<>();
+        for (String key : FORWARD_HEADER_KEYS) {
+            String value = sessionHeaders.get(key);
+            if (value != null) {
+                forwardHeaders.put(key, value);
+            }
+        }
+        newBingGoGoClientWebSocket = new NewBingGoGoClientWebSocket(url,this,messList,forwardHeaders);
     }
 
     @Override
